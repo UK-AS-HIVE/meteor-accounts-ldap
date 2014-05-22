@@ -8,7 +8,7 @@ Package.on_use(function (api) {
   api.use(['accounts-base'], ['client', 'server']);
   api.imply('accounts-base', ['client', 'server']);
   //api.use('srp', ['client', 'server']);
-  api.use(['underscore', 'ui', 'templating', 'bootstrap-3', 'jquery', 'spacebars'], 'client');
+  api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
 
   api.add_files('linkblue_common.js', ['client', 'server']);
   api.add_files([
