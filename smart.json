@@ -3,6 +3,6 @@
 "description": "Enables LinkBlue Authentication",
 "homepage": "https://github.com/UK-AS-HIVE/meteor-accounts-linkblue",
 "author": "Noah Adler-Aly Shehata",
-"version": "0.1.1",
+"version": "0.1.2",
 "git": "https://github.com/UK-AS-HIVE/meteor-accounts-linkblue.git"
 }
