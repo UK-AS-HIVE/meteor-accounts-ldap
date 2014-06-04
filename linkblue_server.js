@@ -104,7 +104,7 @@ Meteor.methods({
         employeeNumber: employeeNumber,
         mail: mail,
         title: title,
-        address : adress
+        address : address
       });
     }
 
