@@ -1,6 +1,6 @@
 <template name="linkblueLogin">
   {{#if currentUser}}
-    Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button>
+    Welcome, {{currentUser.displayName}}. <button class="btn" name="logout">Logout</button>
   {{else}}
     {{#if loggingIn}}
       Logging in...

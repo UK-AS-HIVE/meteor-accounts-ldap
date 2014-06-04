@@ -5,7 +5,6 @@
     return new Spacebars.SafeString(Template.linkblueLogin());
   }
 );*/
-
 var firstAttempt = true;
 
 Template.linkblueLogin.events({
