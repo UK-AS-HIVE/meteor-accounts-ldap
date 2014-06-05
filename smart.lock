@@ -1,0 +1,20 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "accounts-linkblue": {
+        "path": "."
+      }
+    },
+    "packages": {
+      "accounts-linkblue": {
+        "path": "."
+      },
+      "meteor-file": {
+        "git": "https://github.com/EventedMind/meteor-file.git",
+        "tag": "v0.0.7",
+        "commit": "5d3edaaccfb9d0995cf848abfb61c3bd101ea507"
+      }
+    }
+  }
+}
