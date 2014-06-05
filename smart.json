@@ -4,5 +4,8 @@
 "homepage": "https://github.com/UK-AS-HIVE/meteor-accounts-linkblue",
 "author": "Noah Adler-Aly Shehata",
 "version": "0.1.4",
-"git": "https://github.com/UK-AS-HIVE/meteor-accounts-linkblue.git"
+"git": "https://github.com/UK-AS-HIVE/meteor-accounts-linkblue.git",
+"packages":{
+	"meteor-file":{}
+	}
 }

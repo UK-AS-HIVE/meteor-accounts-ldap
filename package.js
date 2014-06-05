@@ -2,9 +2,10 @@ Package.describe({
   summary: "LinkBlue logon account"
 });
 
-Npm.depends({'ldapjs' : '0.7.1'});
+Npm.depends({'ldapjs' : '0.7.1', 'connect' : '2.19.3'});
 
 Package.on_use(function (api) {
+  api.use(['routepolicy', 'webapp'], 'server');
   api.use(['accounts-base'], ['client', 'server']);
   api.imply('accounts-base', ['client', 'server']);
   //api.use('srp', ['client', 'server']);
