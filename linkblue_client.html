@@ -1,11 +1,13 @@
 <template name="linkblueLogin">
   {{#if currentUser}}
-    Welcome, {{currentUser.displayName}}. <button class="btn" name="logout">Logout</button>
+    <div class="navbar-username">Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button></div>
   {{else}}
     {{#if loggingIn}}
+    <div class="logging-in">
       Logging in...
+    </div>
     {{else}}
-      <div>
+      <div class="login-form">
       <table>
       <th width="1px"></th>
       <th></th>
@@ -17,7 +19,7 @@
         <td> <label for="password">Password:</label></td>
         <td><input type="password" name="password" /></td>
         </tr>
-      <td><button class="btn btn-primary" name="login">Login</button></td>
+      <td><button class="btn btn-primary btn-login" name="login">Login</button></td>
       </table>
       {{#if failedLogin}}
         <div class="loginError"><span style="color:red">Invalid Linkblue or Password.</span></div>

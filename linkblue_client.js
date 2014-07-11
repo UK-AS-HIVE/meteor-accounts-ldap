@@ -5,12 +5,12 @@
     return new Spacebars.SafeString(Template.linkblueLogin());
   }
 );*/
+
 var firstAttempt = true;
 
 Template.linkblueLogin.events({
   'click button[name="login"]': function(e, tpl) {
     initLogin(e,tpl);
-    console.log(firstAttempt);
   },
   'keyup input' : function (e, tpl){
     if (e.keyCode == 13){ //If Enter Key Pressed
@@ -18,6 +18,7 @@ Template.linkblueLogin.events({
       }
   },
   'click button[name="logout"]': function(e) {
+    firstAttempt = true;
     Meteor.logout();
   }
 });
