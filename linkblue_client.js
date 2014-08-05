@@ -43,14 +43,18 @@ Template.linkblueLogin.helpers({
 
 
 // Initiate Login Process:
-var initLogin = function(e, tpl)
+initLogin = function(e, tpl)
 {
   firstAttempt = false;
     var username = $(tpl.find('input[name="linkblue"]')).val();
     var password = $(tpl.find('input[name="password"]')).val();
     var result = Meteor.loginWithLdap(username, password, function() {
       console.log ('Callback from Meteor.loginWithLdap');
-      console.log (Meteor.userId());
+      if (Meteor.userId())
+        return true;
+      else 
+        return false
     });
+    return result;
 }
 

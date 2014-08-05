@@ -17,4 +17,21 @@ Package.on_use(function (api) {
     'linkblue_client.js'], 'client');
   api.add_files('linkblue_server.js', 'server');
 
+Package.on_test(function (api) {
+  api.use(['routepolicy', 'webapp'], 'server');
+  api.use(['accounts-base'], ['client', 'server']);
+  //api.use('srp', ['client', 'server']);
+  api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
+
+  api.use(['tinytest', 'test-helpers'], ['client', 'server']);
+  api.add_files('linkblue_common.js', ['client', 'server']);
+  api.add_files([
+    'linkblue_client.html',
+    'linkblue_client.js'], 'client');
+  api.add_files('linkblue_server.js', 'server');
+  api.add_files('accounts-linkblue-tests.js', ['client', 'server']);
+
+
+});
+
 });
