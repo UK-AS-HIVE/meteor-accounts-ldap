@@ -39,7 +39,7 @@ Meteor.methods({
     }
 
     var opts = {
-    filter: '(&(cn='+'dcsc224'+')(objectClass=user))',
+    filter: '(&(cn='+request.username+')(objectClass=user))',
     scope: 'sub'
     };
 
