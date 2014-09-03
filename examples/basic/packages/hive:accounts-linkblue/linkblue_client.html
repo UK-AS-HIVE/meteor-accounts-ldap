@@ -1,0 +1,30 @@
+<template name="linkblueLogin">
+  {{#if currentUser}}
+    <div class="navbar-username">Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button></div>
+  {{else}}
+    {{#if loggingIn}}
+    <div class="logging-in">
+      Logging in...
+    </div>
+    {{else}}
+      <div class="login-form">
+      <table>
+      <th width="1px"></th>
+      <th></th>
+        <tr>
+          <td> <label for="linkblue">LinkBlue:</label> </td>
+          <td> <input type="text" name="linkblue" /></td>
+        </tr>
+        <tr>
+        <td> <label for="password">Password:</label></td>
+        <td><input type="password" name="password" /></td>
+        </tr>
+      <td><button class="btn btn-primary btn-login" name="login">Login</button></td>
+      </table>
+      {{#if failedLogin}}
+        <div class="loginError"><span style="color:red">Invalid Linkblue or Password.</span></div>
+      {{/if}}
+      </div>
+    {{/if}}
+  {{/if}}
+</template>
