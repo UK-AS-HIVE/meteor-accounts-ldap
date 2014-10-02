@@ -1,6 +1,6 @@
 <template name="linkblueLogin">
   {{#if currentUser}}
-    <div class="navbar-username">Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button></div>
+    <div class="navbar-username" style="inline-block">Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button></div>
   {{else}}
     {{#if loggingIn}}
     <div class="logging-in">

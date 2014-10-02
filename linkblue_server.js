@@ -54,37 +54,6 @@ Meteor.methods({
   var address = '';
   var phone = '';
   var memberOf = [];
-
-  //Get Object without converting to strings to enable saving the image.
-  getProperObject = function (entry) {
-    var obj = {
-      dn: entry.dn.toString(),
-      controls: []
-    };
-    entry.attributes.forEach(function (a) {
-      var buf = a.buffers;
-      var val = a.vals;
-      var item;
-      if ( a.type == 'thumbnailPhoto' )
-        item = buf;
-      else
-        item = val;
-      if (item && item.length) {
-        if (item.length > 1) {
-          obj[a.type] = item.slice();
-        } else {
-          obj[a.type] = item[0];
-        }
-      } else {
-        obj[a.type] = [];
-      }
-    });
-    entry.controls.forEach(function (element, index, array) {
-      obj.controls.push(element.json);
-    });
-    return obj;
-  }
-
   var connect = Npm.require('connect');
   var path = Npm.require('path');
 
@@ -95,19 +64,6 @@ function serveFolder(urlPath, diskPath){
     WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
     return true;
 }
-  var appPath =  process.chdir('../../../../../');
-  appPath = process.cwd()+'/';
-  console.log(appPath);
-  serveFolder('/thumbnails/', appPath+'.userThumbnails/');
-  fs.mkdir(appPath+'.userThumbnails', function(error){
-    if (error){
-      console.error(error);
-    }
-    else{
-      console.log("created screenshot directory");
-    }
-  });
-
   client.search( "DC=ad,DC=uky,DC=edu",opts, function(err, res) {
     assert.ifError(err);
     res.on('searchEntry', function(entry) {
@@ -118,23 +74,6 @@ function serveFolder(urlPath, diskPath){
       mail = entry.object.mail;
       title = entry.object.title;
       address = entry.object.physicalDeliveryOfficeName;
-      var properObject = getProperObject(entry); //get proper object to enable writing image buffer
-      fs.mkdir(appPath+'.userThumbnails/'+request.username, function(error){
-        if (error){
-          console.error("Error creating user thumbnail folder. It probably already exists.");
-        }
-        else{
-          console.log("created thumbnail directory");
-        }
-      });
-      fs.writeFile(appPath+'.userThumbnails/'+request.username+'/'+request.username+"-Thumb.jpg", properObject.thumbnailPhoto, function(err) {
-        if(err) {
-          console.log("errror writing thumbnail: "+err);
-        } 
-        else {
-          console.log("thumbnail was saved!");
-        }
-      });      
       phone = entry.object.homePhone;
       memberOf = entry.object.memberOf;
       searchFuture.return(true);

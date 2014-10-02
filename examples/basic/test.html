@@ -11,7 +11,6 @@
 
 <template name="currentUser">
 {{#if currentUser}}
-	
   First Name: {{currentUser.givenName}} <br>
   Display Name: {{currentUser.displayName}}<br>
   Department: {{currentUser.department}} <br>
@@ -22,8 +21,7 @@
   Phone: {{currentUser.phone}}<br>
   Member Of: <br> {{#each currentUser.memberOf}}
   {{this}}<br>
-  {{/each}}<br>
-  Thumbnail: <img src="/thumbnails/{{currentUser.username}}/{{currentUser.username}}-Thumb.jpg">
+  {{/each}}
 {{/if}}
 
 
