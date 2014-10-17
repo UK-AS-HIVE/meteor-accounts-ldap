@@ -44,53 +44,57 @@ Meteor.methods({
     };
 
 
-  var searchFuture = new Future();
-  var displayName = '';
-  var givenName = '';
-  var department = '';
-  var employeeNumber = '';
-  var mail = '';
-  var title = '';
-  var address = '';
-  var phone = '';
-  var memberOf = [];
-  var connect = Npm.require('connect');
-  var path = Npm.require('path');
+    var searchFuture = new Future();
+    var displayName = '';
+    var givenName = '';
+    var department = '';
+    var employeeNumber = '';
+    var mail = '';
+    var title = '';
+    var address = '';
+    var phone = '';
+    var memberOf = [];
+    var connect = Npm.require('connect');
+    var path = Npm.require('path');
 
-function serveFolder(urlPath, diskPath){
-    if(!fs.existsSync(diskPath))
-        return false;
-    RoutePolicy.declare(urlPath, 'network');
-    WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
-    return true;
-}
-  client.search( "DC=ad,DC=uky,DC=edu",opts, function(err, res) {
-    assert.ifError(err);
-    res.on('searchEntry', function(entry) {
-      displayName = entry.object.displayName;
-      givenName = entry.object.givenName;
-      department = entry.object.department;
-      employeeNumber = entry.object.employeeNumber;
-      mail = entry.object.mail;
-      title = entry.object.title;
-      address = entry.object.physicalDeliveryOfficeName;
-      phone = entry.object.homePhone;
-      memberOf = entry.object.memberOf;
-      searchFuture.return(true);
+    function serveFolder(urlPath, diskPath){
+      if(!fs.existsSync(diskPath))
+          return false;
+      RoutePolicy.declare(urlPath, 'network');
+      WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
+      return true;
+    }
+    
+    client.search( "DC=ad,DC=uky,DC=edu",opts, function(err, res) {
+      assert.ifError(err);
+      res.on('searchEntry', function(entry) {
+        displayName = entry.object.displayName;
+        givenName = entry.object.givenName;
+        department = entry.object.department;
+        employeeNumber = entry.object.employeeNumber;
+        mail = entry.object.mail;
+        title = entry.object.title;
+        address = entry.object.physicalDeliveryOfficeName;
+        phone = entry.object.homePhone;
+        memberOf = entry.object.memberOf;
+        searchFuture.return(true);
+      });
+      
+      res.on('searchReference', function(referral) {
+        console.log('referral: ' + referral.uris.join());
+      });
+      
+      res.on('error', function(err) {
+        console.error('error: ' + err.message);
+        searchFuture.return(false);
+      });
+     
+      res.on('end', function(result) {
+        console.log('status: ' + result.status);
+      });
     });
-    res.on('searchReference', function(referral) {
-      console.log('referral: ' + referral.uris.join());
-    });
-    res.on('error', function(err) {
-      console.error('error: ' + err.message);
-      searchFuture.return(false);
-    });
-    res.on('end', function(result) {
-      console.log('status: ' + result.status);
-    });
-  });
 
-  var searchSuccess = searchFuture.wait();
+    var searchSuccess = searchFuture.wait();
 
 
     // If the user name is not found, create a new user
