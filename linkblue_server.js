@@ -144,8 +144,3 @@ Meteor.methods({
   }
 });
 
-Accounts.registerLoginHandler(function (options) {
-  // TODO: This could be useful if we want mixed-mode login.
-  // For using LDAP only, it is not really relevant.
-});
-
