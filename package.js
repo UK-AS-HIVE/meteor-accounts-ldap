@@ -11,26 +11,26 @@ Package.on_use(function (api) {
   api.use(['routepolicy', 'webapp'], 'server');
   api.use(['accounts-base'], ['client', 'server']);
   api.imply('accounts-base', ['client', 'server']);
-  //api.use('srp', ['client', 'server']);
+  //api.use('srp', ['client_functions', 'server']);
   api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
 
   api.add_files([
-    'ldap_client.html',
-    'ldap_client.js'], 'client');
+    'ldap_client_functions.html',
+    'ldap_client_functions.js'], 'client');
   api.add_files([
     'ldap_authenticate.js',
     'ldap_loginhandler.js'], 'server');
 
 Package.on_test(function (api) {
   api.use(['routepolicy', 'webapp'], 'server');
-  api.use(['accounts-base'], ['client', 'server']);
-  //api.use('srp', ['client', 'server']);
+  api.use(['accounts-base'], ['client_functions', 'server']);
+  //api.use('srp', ['client_functions', 'server']);
   api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
 
-  api.use(['tinytest', 'test-helpers'], ['client', 'server']);
+  api.use(['tinytest', 'test-helpers'], ['client_functions', 'server']);
   api.add_files([
-    'ldap_client.html',
-    'ldap_client.js'], 'client');
+    'ldap_client_functions.html',
+    'ldap_client_functions.js'], 'client');
   api.add_files([
     'ldap_authenticate.js',
     'ldap_loginhandler.js'], 'server');

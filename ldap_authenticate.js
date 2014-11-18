@@ -4,6 +4,7 @@ Meteor.methods({
     
     serverURL='ldap://gc.ad.uky.edu:3268';
     serverDN = 'AD.UKY.EDU';    
+    serverDC="DC=ad,DC=uky,DC=edu";
     // Authenticate against LDAP
     var fs = Npm.require('fs');
     var ldap = Npm.require('ldapjs');
@@ -58,16 +59,8 @@ Meteor.methods({
     var memberOf = [];
     var connect = Npm.require('connect');
     var path = Npm.require('path');
-
-    function serveFolder(urlPath, diskPath){
-      if(!fs.existsSync(diskPath))
-          return false;
-      RoutePolicy.declare(urlPath, 'network');
-      WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
-      return true;
-    }
-    
-    client.search( "DC=ad,DC=uky,DC=edu",opts, function(err, res) {
+ 
+    client.search(serverDC,opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
         displayName = entry.object.displayName;
@@ -146,3 +139,10 @@ Meteor.methods({
   }
 });
 
+function serveFolder(urlPath, diskPath){
+  if(!fs.existsSync(diskPath))
+    return false;
+  RoutePolicy.declare(urlPath, 'network');
+  WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
+  return true;
+}
