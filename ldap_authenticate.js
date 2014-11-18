@@ -1,22 +1,24 @@
 Meteor.methods({
   loginWithLdap: function (request) {
     console.log ('LinkBlue authentication for ' + request.username);
-
+    
+    serverURL='ldap://gc.ad.uky.edu:3268';
+    serverDN = 'AD.UKY.EDU';    
     // Authenticate against LDAP
     var fs = Npm.require('fs');
     var ldap = Npm.require('ldapjs');
     var Future = Npm.require('fibers/future');
     var assert = Npm.require('assert');
     var client = ldap.createClient({
-      url: 'ldap://gc.ad.uky.edu:3268'
+      url: serverURL
     });
 
-    var userDN = request.username+'@AD.UKY.EDU';
+
+    var userDN = request.username+'@'+serverDN;
 
 
     var bindFuture = new Future();
-
-
+ 
     client.bind(userDN, request.password, function (err) {
       console.log ('Callback from binding LDAP');
       if (err) {
