@@ -69,17 +69,15 @@ Meteor.methods({
     // If the user name is not found, create a new user
     var userId;
     var user = Meteor.users.findOne({username: request.username});
-    var userObj = {username: request.username};
-    userObj = _.extend(userObj, fields);
+    userObj = _.extend({username: request.username}, fields);
+    
     if (user) {
       userId = user._id;
-      Meteor.users.update(userId, {$set:
-        fields 
-      });
+      Meteor.users.update(userId, {$set: userObj});
     } else {
       userId = Meteor.users.insert(userObj);
     }
-
+    console.log(userId);
     var stampedToken = Accounts._generateStampedLoginToken();
     Meteor.users.update(userId,
       {$push: {'services.resume.loginTokens': stampedToken}}
