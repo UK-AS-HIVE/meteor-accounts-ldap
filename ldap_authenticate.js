@@ -77,7 +77,6 @@ Meteor.methods({
     } else {
       userId = Meteor.users.insert(userObj);
     }
-    console.log(userId);
     var stampedToken = Accounts._generateStampedLoginToken();
     Meteor.users.update(userId,
       {$push: {'services.resume.loginTokens': stampedToken}}
