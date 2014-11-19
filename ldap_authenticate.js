@@ -1,12 +1,11 @@
 Meteor.methods({
   loginWithLdap: function (request) {
-    console.log ('LinkBlue authentication for ' + request.username);
+    console.log ('LDAP authentication for ' + request.username);
     
     serverURL='ldap://gc.ad.uky.edu:3268';
     serverDN = 'AD.UKY.EDU';    
     serverDC="DC=ad,DC=uky,DC=edu";
     // Authenticate against LDAP
-    var fs = Npm.require('fs');
     var ldap = Npm.require('ldapjs');
     var Future = Npm.require('fibers/future');
     var assert = Npm.require('assert');
@@ -14,10 +13,7 @@ Meteor.methods({
       url: serverURL
     });
 
-
     var userDN = request.username+'@'+serverDN;
-
-
     var bindFuture = new Future();
  
     client.bind(userDN, request.password, function (err) {
@@ -36,14 +32,13 @@ Meteor.methods({
 
     var success = bindFuture.wait();
 
-    if (!success || request.password == '') {
+    if (!success || request.password === '') {
       throw new Meteor.Error(403, "Invalid credentials");
-      return;
     }
 
     var opts = {
-    filter: '(&(cn='+request.username+')(objectClass=user))',
-    scope: 'sub'
+      filter: '(&(cn='+request.username+')(objectClass=user))',
+      scope: 'sub'
     };
 
 
@@ -57,10 +52,8 @@ Meteor.methods({
     var address = '';
     var phone = '';
     var memberOf = [];
-    var connect = Npm.require('connect');
-    var path = Npm.require('path');
  
-    client.search(serverDC,opts, function(err, res) {
+    client.search(serverDC, opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
         displayName = entry.object.displayName;
@@ -139,10 +132,3 @@ Meteor.methods({
   }
 });
 
-function serveFolder(urlPath, diskPath){
-  if(!fs.existsSync(diskPath))
-    return false;
-  RoutePolicy.declare(urlPath, 'network');
-  WebApp.connectHandlers.use(urlPath, connect.static(diskPath));
-  return true;
-}
