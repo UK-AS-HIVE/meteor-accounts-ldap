@@ -13,6 +13,7 @@ Package.on_use(function (api) {
   api.imply('accounts-base', ['client', 'server']);
   //api.use('srp', ['client_functions', 'server']);
   api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
+  api.use('underscore', 'server');
 
   api.add_files([
     'ldap_client_functions.html',

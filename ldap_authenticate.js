@@ -1,7 +1,6 @@
 Meteor.methods({
   loginWithLdap: function (request) {
     console.log ('LDAP authentication for ' + request.username);
-    
     serverURL='ldap://gc.ad.uky.edu:3268';
     serverDN = 'AD.UKY.EDU';    
     serverDC="DC=ad,DC=uky,DC=edu";
@@ -19,11 +18,8 @@ Meteor.methods({
     client.bind(userDN, request.password, function (err) {
       console.log ('Callback from binding LDAP');
       if (err) {
-        console.log(err.dn);
-        console.log(err.code);
-        console.log(err.name);
-        console.log(err.message);
         console.log('LDAP bind failed');
+        console.log([err.dn, err.code, err.name, err.message]);
         bindFuture.return(false);
       } else {
         bindFuture.return(true);
@@ -41,30 +37,15 @@ Meteor.methods({
       scope: 'sub'
     };
 
-
     var searchFuture = new Future();
-    var displayName = '';
-    var givenName = '';
-    var department = '';
-    var employeeNumber = '';
-    var mail = '';
-    var title = '';
-    var address = '';
-    var phone = '';
-    var memberOf = [];
+    
+    var fields = {};
+    whiteListedFields = ['displayName', 'givenName', 'department', 'employeeNumber', 'mail', 'title', 'address', 'phone', 'memberOf'];
  
     client.search(serverDC, opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
-        displayName = entry.object.displayName;
-        givenName = entry.object.givenName;
-        department = entry.object.department;
-        employeeNumber = entry.object.employeeNumber;
-        mail = entry.object.mail;
-        title = entry.object.title;
-        address = entry.object.physicalDeliveryOfficeName;
-        phone = entry.object.homePhone;
-        memberOf = entry.object.memberOf;
+        fields = _.pick(entry.object, whiteListedFields);
         searchFuture.return(true);
       });
       
@@ -88,33 +69,15 @@ Meteor.methods({
     // If the user name is not found, create a new user
     var userId;
     var user = Meteor.users.findOne({username: request.username});
-
+    var userObj = {username: request.username};
+    userObj = _.extend(userObj, fields);
     if (user) {
       userId = user._id;
-      Meteor.users.update(userId, {$set: {
-        displayName: displayName, 
-        givenName: givenName, 
-        department:department,
-        employeeNumber: employeeNumber,
-        mail: mail,
-        title: title,
-        address: address,
-        phone: phone,
-        memberOf: memberOf
-      }});
-    } else {
-      userId = Meteor.users.insert({
-        username: request.username,
-        displayName: displayName,
-        givenName: givenName, 
-        department: department,
-        employeeNumber: employeeNumber,
-        mail: mail,
-        title: title,
-        address : address,
-        phone: phone,
-        memberOf: memberOf
+      Meteor.users.update(userId, {$set:
+        fields 
       });
+    } else {
+      userId = Meteor.users.insert(userObj);
     }
 
     var stampedToken = Accounts._generateStampedLoginToken();
