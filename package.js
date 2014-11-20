@@ -9,11 +9,10 @@ Npm.depends({'ldapjs' : '0.7.1', 'connect' : '2.19.3'});
 
 Package.on_use(function (api) {
   api.use(['routepolicy', 'webapp'], 'server');
-  api.use(['accounts-base'], ['client', 'server']);
+  api.use(['accounts-base', 'underscore'], ['client', 'server']);
   api.imply('accounts-base', ['client', 'server']);
   //api.use('srp', ['client_functions', 'server']);
-  api.use(['underscore', 'ui', 'templating', 'jquery', 'spacebars'], 'client');
-  api.use('underscore', 'server');
+  api.use(['ui', 'templating', 'jquery', 'spacebars'], 'client');
 
   api.add_files([
     'ldap_client_functions.html',
