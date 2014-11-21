@@ -23,9 +23,8 @@ Meteor.methods({
         bindFuture.return(true);
       }
     });
-
+    
     var success = bindFuture.wait();
-
     if (!success || request.password === '') {
       throw new Meteor.Error(403, "Invalid credentials");
     }
@@ -34,10 +33,9 @@ Meteor.methods({
       filter: '(&(cn='+request.username+')(objectClass=user))',
       scope: 'sub'
     };
-
     var searchFuture = new Future();
     var userObj = {};
-
+    //Searching to retrieve the other fields for our user.
     client.search(process.env.SERVERDC, opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
@@ -55,7 +53,7 @@ Meteor.methods({
       });
     });
 
-    // If the user name is not found, create a new user
+    //Add the user to users, or update the user if it already exists.
     var userId;
     var user = Meteor.users.findOne({username: request.username});
     

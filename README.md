@@ -1,7 +1,7 @@
 Accounts-Linkblue
 ==
 ##Overview##
-This is a package to implement authentication against an LDAP server in Meteor.js. 
+This is a package to implement authentication against an LDAP server and retrieve user attributes from that server in Meteor.js. 
 
 ##Installation##
 
