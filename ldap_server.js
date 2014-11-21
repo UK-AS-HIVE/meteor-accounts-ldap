@@ -1,25 +1,21 @@
 Meteor.methods({
   loginWithLdap: function (request) {
     console.log ('LDAP authentication for ' + request.username);
-    serverURL='ldap://gc.ad.uky.edu:3268';
-    serverDN = 'AD.UKY.EDU';    
-    serverDC="DC=ad,DC=uky,DC=edu";
-    // Authenticate against LDAP
     var ldap = Npm.require('ldapjs');
     var Future = Npm.require('fibers/future');
     var assert = Npm.require('assert');
     var client = ldap.createClient({
-      url: serverURL
+      url: process.env.SERVERURL
     });
 
-    var userDN = request.username+'@'+serverDN;
+    var userDN = request.username+'@'+process.env.SERVERDN;
     var bindFuture = new Future();
- 
+    //Bind client (our app) to the LDAP server.  
     client.bind(userDN, request.password, function (err) {
-      console.log ('Callback from binding LDAP');
+      console.log ('Callback from binding LDAP:');
       if (err) {
-        console.log('LDAP bind failed');
-        console.log([err.dn, err.code, err.name, err.message]);
+        console.log('LDAP bind failed with error');
+        console.log({dn: err.dn, code: err.code, name: err.name, message: err.message});
         bindFuture.return(false);
       } else {
         bindFuture.return(true);
@@ -39,18 +35,16 @@ Meteor.methods({
 
     var searchFuture = new Future();
     
-    var fields = {};
-    whiteListedFields = ['displayName', 'givenName', 'department', 'employeeNumber', 'mail', 'title', 'address', 'phone', 'memberOf'];
+    var userObj = {};
+    whiteListedFields = ['username,', 'displayName', 'givenName', 'department', 'employeeNumber', 'mail', 'title', 'address', 'phone', 'memberOf'];
  
-    client.search(serverDC, opts, function(err, res) {
+    client.search(process.env.SERVERDC, opts, function(err, res) {
+
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
-        fields = _.pick(entry.object, whiteListedFields);
+        userObj = _.extend({username: request.username},_.pick(entry.object, whiteListedFields));
+        console.log(userObj);
         searchFuture.return(true);
-      });
-      
-      res.on('searchReference', function(referral) {
-        console.log('referral: ' + referral.uris.join());
       });
       
       res.on('error', function(err) {
@@ -63,13 +57,9 @@ Meteor.methods({
       });
     });
 
-    var searchSuccess = searchFuture.wait();
-
-
     // If the user name is not found, create a new user
     var userId;
     var user = Meteor.users.findOne({username: request.username});
-    userObj = _.extend({username: request.username}, fields);
     
     if (user) {
       userId = user._id;
