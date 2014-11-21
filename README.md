@@ -21,3 +21,7 @@ To run example:
 - cd hive:accounts-linkblue/examples/basic
 - source config/env.sh.example
 - meteor run
+
+##Future Possibilities##
+Would like to get this registered as a login handler for meteor-accounts.
+
