@@ -17,9 +17,7 @@ Package.on_use(function (api) {
   api.add_files([
     'ldap_client_functions.html',
     'ldap_client_functions.js'], 'client');
-  api.add_files([
-    'ldap_authenticate.js',
-    'ldap_loginhandler.js'], 'server');
+  api.add_files('ldap_server.js', 'server');
 
 Package.on_test(function (api) {
   api.use(['routepolicy', 'webapp'], 'server');
@@ -31,9 +29,7 @@ Package.on_test(function (api) {
   api.add_files([
     'ldap_client_functions.html',
     'ldap_client_functions.js'], 'client');
-  api.add_files([
-    'ldap_authenticate.js',
-    'ldap_loginhandler.js'], 'server');
+  api.add_files('ldap_server.js', 'server');
   api.add_files('accounts-ldap-tests.js', ['client', 'server']);
 
 
