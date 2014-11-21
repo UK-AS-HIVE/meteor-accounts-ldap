@@ -7,6 +7,8 @@ Meteor.methods({
     var client = ldap.createClient({
       url: process.env.SERVERURL
     });
+    //Fields to grab from the LDAP search. These can be modified if needed. 
+    whiteListedFields = ['username,', 'displayName', 'givenName', 'department', 'employeeNumber', 'mail', 'title', 'address', 'phone', 'memberOf'];
 
     var userDN = request.username+'@'+process.env.SERVERDN;
     var bindFuture = new Future();
@@ -34,16 +36,12 @@ Meteor.methods({
     };
 
     var searchFuture = new Future();
-    
     var userObj = {};
-    whiteListedFields = ['username,', 'displayName', 'givenName', 'department', 'employeeNumber', 'mail', 'title', 'address', 'phone', 'memberOf'];
- 
-    client.search(process.env.SERVERDC, opts, function(err, res) {
 
+    client.search(process.env.SERVERDC, opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
         userObj = _.extend({username: request.username},_.pick(entry.object, whiteListedFields));
-        console.log(userObj);
         searchFuture.return(true);
       });
       
