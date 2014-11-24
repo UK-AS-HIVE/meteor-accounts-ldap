@@ -1,0 +1,28 @@
+<head>
+  <title>test</title>
+</head>
+
+<body>
+  {{> linkblueLogin}}<br>
+  {{> currentUser}}
+</body>
+
+
+
+<template name="currentUser">
+{{#if currentUser}}
+  First Name: {{currentUser.givenName}} <br>
+  Display Name: {{currentUser.displayName}}<br>
+  Department: {{currentUser.department}} <br>
+  Email : {{currentUser.mail}} <br>
+  Title: {{currentUser.title}} <br>
+  Employee Number: {{currentUser.employeeNumber}}<br>
+  Address: {{currentUser.address}}<br>
+  Phone: {{currentUser.phone}}<br>
+  Member Of: <br> {{#each currentUser.memberOf}}
+  {{this}}<br>
+  {{/each}}
+{{/if}}
+
+
+</template>
