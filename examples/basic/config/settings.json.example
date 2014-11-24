@@ -2,5 +2,5 @@
   "server_dn": "AD.UKY.EDU",
   "server_dc": "DC=ad,DC=uky,DC=edu",
   "server_url": "ldap://gc.ad.uky.edu:3268",
-  "whiteListedFields": ["username", "displayName", "givenName", "department", "employeeNumber", "mail", "title", "address", "phone", "memberOf"]
+  "whiteListedFields": [ "displayName", "givenName", "department", "employeeNumber", "mail", "title", "address", "phone", "memberOf"]
 }

@@ -1,7 +1,7 @@
 Package.describe({
   'summary': 'LinkBlue account login via LDAP',
   'version': '0.2.0',
-  'git' : 'https://github.com/UK-AS-HIVE/meteor-accounts-ldap',
+  'git' : 'https://github.com/UK-AS-HIVE/meteor-accounts-linkblue',
   'name' : 'hive:accounts-linkblue'
 });
 

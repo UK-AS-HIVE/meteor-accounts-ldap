@@ -7,11 +7,11 @@ Meteor.methods({
     var client = ldap.createClient({
       url: Meteor.settings.server_url
     });
-    //Fields to grab from the LDAP search. These can be modified if needed. 
 
     var userDN = request.username+'@'+Meteor.settings.server_dn;
     var bindFuture = new Future();
-    //Bind client (our app) to the LDAP server.  
+
+    //Bind to the LDAP server.  
     client.bind(userDN, request.password, function (err) {
       console.log ('Callback from binding LDAP:');
       if (err) {
@@ -34,6 +34,7 @@ Meteor.methods({
     };
     var searchFuture = new Future();
     var userObj = {};
+
     //Searching to retrieve the other fields for our user.
     client.search(Meteor.settings.server_dc, opts, function(err, res) {
       assert.ifError(err);
