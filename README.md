@@ -13,9 +13,9 @@ To install the package, create a packages/ directory in your meteor app, and mov
 * meteor add hive:accounts-linkblue
 
 ##Usage##
-Your server's URL, DN, and the DC to search will need to be defined as environment variables SERVERURL, SERVERDN, and SERVERDC, respectively. We recommend setting these up in a shell script which can be used both in the development and production environments. An example of this is in `examples/basic/config/env.sh.example`.
+Your server's DN, DC, and URL will need to be set in a settings.json file as `server_dn`, `server_dc`, and `server_url`, respectively. In addition, you should select an array of `whiteListedFields` to pull from the LDAP object. An example is in `examples/basic/config/settings.json.example`. 
 
-`{{> linkblueLogin}}` renders a template with username and password inputs. If login is successful, user will be added to Meteor.users(). It is up to the app to publish and subscribe fields. By default only the username is published.
+`{{> linkblueLogin}}` renders a template with username and password inputs. If login is successful, the user will be added to Meteor.users(). It is up to the app to publish and subscribe fields. By default, only the username is published.
 
 To run example:
 - cd hive:accounts-linkblue/examples/basic
