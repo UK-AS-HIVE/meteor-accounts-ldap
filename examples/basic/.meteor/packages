@@ -5,5 +5,5 @@
 
 standard-app-packages
 insecure
-hive:accounts-linkblue
+hive:accounts-ldap
 

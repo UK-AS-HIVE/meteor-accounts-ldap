@@ -1,14 +1,14 @@
 
 /*UI.registerHelper(
-  "linkblueLogin",
+  "ldapLogin",
   function (option) {
-    return new Spacebars.SafeString(Template.linkblueLogin());
+    return new Spacebars.SafeString(Template.ldapLogin());
   }
 );*/
 
 var firstAttempt = true;
 
-Template.linkblueLogin.events({
+Template.ldapLogin.events({
   'click button[name="login"]': function(e, tpl) {
     initLogin(e,tpl);
   },
@@ -33,7 +33,7 @@ Meteor.loginWithLdap = function (username, password, callback) {
   });
 };
 
-Template.linkblueLogin.helpers({
+Template.ldapLogin.helpers({
   failedLogin : function(){
     return !firstAttempt; //return true if more than one attempt has been made. Show Error Message
   }
@@ -44,7 +44,7 @@ Template.linkblueLogin.helpers({
 initLogin = function(e, tpl)
 {
   firstAttempt = false;
-    var username = $(tpl.find('input[name="linkblue"]')).val();
+    var username = $(tpl.find('input[name="ldap"]')).val();
     var password = $(tpl.find('input[name="password"]')).val();
     var result = Meteor.loginWithLdap(username, password, function() {
       if (Meteor.userId())

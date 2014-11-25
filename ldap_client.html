@@ -1,4 +1,4 @@
-<template name="linkblueLogin">
+<template name="ldapLogin">
   {{#if currentUser}}
     <div class="navbar-username" style="inline-block">Welcome, {{currentUser.username}}. <button class="btn" name="logout">Logout</button></div>
   {{else}}
@@ -12,8 +12,8 @@
       <th width="1px"></th>
       <th></th>
         <tr>
-          <td> <label for="linkblue">LinkBlue:</label> </td>
-          <td> <input type="text" name="linkblue" /></td>
+          <td> <label for="ldap">Username:</label> </td>
+          <td> <input type="text" name="ldap" /></td>
         </tr>
         <tr>
         <td> <label for="password">Password:</label></td>
@@ -22,7 +22,7 @@
       <td><button class="btn btn-primary btn-login" name="login">Login</button></td>
       </table>
       {{#if failedLogin}}
-        <div class="loginError"><span style="color:red">Invalid Linkblue or Password.</span></div>
+        <div class="loginError"><span style="color:red">Invalid Username or Password.</span></div>
       {{/if}}
       </div>
     {{/if}}
