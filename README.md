@@ -22,5 +22,4 @@ To run example:
 - meteor --settings config/settings.json
 
 ##Future Possibilities##
-Would like to get this registered as a login handler for meteor-accounts.
 
