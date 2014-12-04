@@ -43,7 +43,7 @@ Meteor.methods({
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
         userObj = _.extend({username: request.username},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
-        searchFuture.return(true);
+        searchFuture.return(true); 
       });
       
       res.on('error', function(err) {
@@ -55,11 +55,10 @@ Meteor.methods({
         console.log('status: ' + result.status);
       });
     });
-
+    var searchSuccess = searchFuture.wait();
     //Add the user to users, or update the user if it already exists.
     var userId;
     var user = Meteor.users.findOne({username: request.username});
-    
     if (user) {
       userId = user._id;
       Meteor.users.update(userId, {$set: userObj});
