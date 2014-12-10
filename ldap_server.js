@@ -8,14 +8,14 @@ Meteor.methods({
     var Future = Npm.require('fibers/future');
     var assert = Npm.require('assert');
     var client = ldap.createClient({
-      url: Meteor.settings.ldap.server_url
+      url: Meteor.settings.ldap.serverUrl
     });
 
-    var userDN = request.username+'@'+Meteor.settings.ldap.server_dn;
+    var userDn = request.username+'@'+Meteor.settings.ldap.serverDn;
     var bindFuture = new Future();
 
     //Bind to the LDAP server.  
-    client.bind(userDN, request.password, function (err) {
+    client.bind(userDn, request.password, function (err) {
       console.log ('Callback from binding LDAP:');
       if (err) {
         console.log('LDAP bind failed with error');
@@ -39,7 +39,7 @@ Meteor.methods({
     var userObj = {};
 
     //Searching to retrieve the other fields for our user.
-    client.search(Meteor.settings.ldap.server_dc, opts, function(err, res) {
+    client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
       assert.ifError(err);
       res.on('searchEntry', function(entry) {
         userObj = _.extend({username: request.username},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));

@@ -1,8 +1,8 @@
 {
   "ldap": {
-    "server_dn": "AD.UNIVERSITY.EDU",
-    "server_dc": "DC=ad,DC=university,DC=edu",
-    "server_url": "ldap://ad.university.edu:2222",
+    "serverDn": "AD.UNIVERSITY.EDU",
+    "serverDc": "DC=ad,DC=university,DC=edu",
+    "serverUrl": "ldap://ad.university.edu:2222",
     "whiteListedFields": [ "displayName", "givenName", "department", "employeeNumber", "mail", "title", "address", "phone", "memberOf"]
   }
 }
