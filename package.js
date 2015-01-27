@@ -1,6 +1,6 @@
 Package.describe({
   'summary': 'Meteor account login via LDAP',
-  'version': '0.1.0',
+  'version': '0.2.0',
   'git' : 'https://github.com/UK-AS-HIVE/meteor-accounts-ldap',
   'name' : 'hive:accounts-ldap'
 });
@@ -13,7 +13,7 @@ Package.on_use(function (api) {
   api.imply('accounts-base', ['client', 'server']);
   //api.use('srp', ['client_functions', 'server']);
   api.use(['ui', 'templating', 'jquery', 'spacebars'], 'client');
-
+  api.export('LDAP','server');
   api.add_files([
     'ldap_client.html',
     'ldap_client.js'], 'client');
