@@ -3,17 +3,19 @@ var ldap = Npm.require('ldapjs');
 var Future = Npm.require('fibers/future');
 var assert = Npm.require('assert');
 
-LDAP.bind = function (username, password) {
-  //Create our LDAP client and bind to the LDAP server.
-
-  LDAP.client = ldap.createClient({
-    url: Meteor.settings.ldap.serverUrl
+LDAP.createClient = function(serverUrl) {
+  var client = ldap.createClient({
+    url: serverUrl
   });
+  return client;
+}
 
+LDAP.bind = function (client, username, password) {
+  //Bind our LDAP client.
   var userDn = username+'@'+Meteor.settings.ldap.serverDn;
   var bindFuture = new Future();
 
-  LDAP.client.bind(userDn, password, function (err) {
+  client.bind(userDn, password, function (err) {
     console.log ('Callback from binding LDAP:');
     if (err) {
     console.log(err);
@@ -32,7 +34,7 @@ LDAP.bind = function (username, password) {
   return bindFuture.wait();
 }
 
-LDAP.search = function (searchUsername) {
+LDAP.search = function (client, searchUsername) {
   //Search our previously bound connection. If the LDAP client isn't bound, this should throw an error.
   var opts = {
     filter: '(&(cn='+searchUsername+')(objectClass=user))',
@@ -40,7 +42,7 @@ LDAP.search = function (searchUsername) {
     timeLimit: 2
   };
   var searchFuture = new Future();
-  LDAP.client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
+  client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
     userObj = {};
     if(err) {
       searchFuture.return(500)
@@ -68,7 +70,6 @@ LDAP.search = function (searchUsername) {
       });
     }
   });
-
   return searchFuture.wait();
 }
 
@@ -78,10 +79,10 @@ Meteor.methods({
       throw new Error("LDAP settings missing.");
     }
     console.log('LDAP authentication for ' + request.username);
-
-    LDAP.bind(request.username, request.password);
-    userObj = LDAP.search(request.username);
-
+    var client = LDAP.createClient(Meteor.settings.ldap.serverUrl);
+    LDAP.bind(client, request.username, request.password);
+    userObj = LDAP.search(client, request.username);
+    client.unbind();
     var userId;
     var user = Meteor.users.findOne({username: request.username});
     if (user) {
