@@ -16,6 +16,7 @@ LDAP.bind = function (username, password) {
   LDAP.client.bind(userDn, password, function (err) {
     console.log ('Callback from binding LDAP:');
     if (err) {
+    console.log(err);
       console.log('LDAP bind failed with error');
       console.log({dn: err.dn, code: err.code, name: err.name, message: err.message});
       bindFuture.return(false);
@@ -41,27 +42,31 @@ LDAP.search = function (searchUsername) {
   var searchFuture = new Future();
   LDAP.client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
     userObj = {};
-    assert.ifError(err);
-    res.on('searchEntry', function(entry) {
-      userObj = _.extend({username: searchUsername},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
-      searchFuture.return(userObj); 
-    });
-    res.on('searchReference', function (referral) {
-      console.log('referral: ' + referral.uris.join());
-      searchFuture.return(false);
-    });
-    res.on('error', function(err) {
-      console.error('error: ' + err.message);
-      searchFuture.return(false);
-    });
-    res.on('end', function(result) {
-      if (_.isEmpty(userObj)) {
-        //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
-        console.log("No result found.");
-        searchFuture.return(false)
-      }
-      console.log('status: ' + result.status);
-    });
+    if(err) {
+      searchFuture.return(500)
+    }
+    else {
+      res.on('searchEntry', function(entry) {
+        userObj = _.extend({username: searchUsername},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
+        searchFuture.return(userObj); 
+      });
+      res.on('searchReference', function (referral) {
+        console.log('referral: ' + referral.uris.join());
+        searchFuture.return(false);
+      });
+      res.on('error', function(err) {
+        console.error('error: ' + err.message);
+        searchFuture.return(false);
+      });
+      res.on('end', function(result) {
+        if (_.isEmpty(userObj)) {
+          //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
+          console.log("No result found.");
+          searchFuture.return(false)
+        }
+        console.log('status: ' + result.status);
+      });
+    }
   });
 
   return searchFuture.wait();
