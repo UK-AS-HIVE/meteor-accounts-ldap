@@ -49,7 +49,7 @@ LDAP.search = function (client, searchUsername) {
     }
     else {
       res.on('searchEntry', function(entry) {
-        userObj = _.extend({username: searchUsername},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
+        userObj = _.extend({username: searchUsername.toLowerCase()},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
         searchFuture.return(userObj); 
       });
       res.on('searchReference', function (referral) {
@@ -84,7 +84,7 @@ Meteor.methods({
     userObj = LDAP.search(client, request.username);
     client.unbind();
     var userId;
-    var user = Meteor.users.findOne({username: request.username});
+    var user = Meteor.users.findOne({username: request.username.toLowerCase()});
     if (user) {
       userId = user._id;
       Meteor.users.update(userId, {$set: userObj});
@@ -101,8 +101,8 @@ Meteor.methods({
 
     return {
       id: userId,
-        token: stampedToken.token,
-        tokenExpires: Accounts._tokenExpiration(stampedToken.when)
+      token: stampedToken.token,
+      tokenExpires: Accounts._tokenExpiration(stampedToken.when)
     };
   }
 });
