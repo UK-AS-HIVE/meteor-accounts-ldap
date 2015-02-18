@@ -1,6 +1,6 @@
 Package.describe({
   'summary': 'Meteor account login via LDAP',
-  'version': '0.2.2',
+  'version': '0.3.0',
   'git' : 'https://github.com/UK-AS-HIVE/meteor-accounts-ldap',
   'name' : 'hive:accounts-ldap'
 });
