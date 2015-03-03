@@ -91,7 +91,11 @@ Meteor.methods({
     } else {
       userId = Meteor.users.insert(userObj);
     }
-
+    if(Meteor.settings.ldap.autopublishFields) {
+      Accounts.addAutopublishFields({
+        forLoggedInUser: Meteor.settings.ldap.autopublishFields
+      });
+    }
     var stampedToken = Accounts._generateStampedLoginToken();
     Meteor.users.update(userId,
         {$push: {'services.resume.loginTokens': stampedToken}}
