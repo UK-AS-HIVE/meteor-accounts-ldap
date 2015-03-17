@@ -41,36 +41,45 @@ LDAP.search = function (client, searchUsername) {
     scope: 'sub',
     timeLimit: 2
   };
-  var searchFuture = new Future();
-  client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
-    userObj = {};
-    if(err) {
-      searchFuture.return(500)
-    }
-    else {
-      res.on('searchEntry', function(entry) {
-        userObj = _.extend({username: searchUsername.toLowerCase()},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
-        searchFuture.return(userObj); 
-      });
-      res.on('searchReference', function (referral) {
-        console.log('referral: ' + referral.uris.join());
-        searchFuture.return(false);
-      });
-      res.on('error', function(err) {
-        console.error('error: ' + err.message);
-        searchFuture.return(false);
-      });
-      res.on('end', function(result) {
-        if (_.isEmpty(userObj)) {
-          //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
-          console.log("No result found.");
-          searchFuture.return(false)
-        }
-        console.log('status: ' + result.status);
-      });
+  var serverDCs = typeof(Meteor.settings.ldap.serverDc) == 'string'?[Meteor.settings.ldap.serverDc]:Meteor.settings.ldap.serverDc;
+  var result = false;
+  _.each(serverDCs, function(serverDc) {
+    var searchFuture = new Future();
+    client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
+      userObj = {};
+      if(err) {
+        searchFuture.return(500)
+      }
+      else {
+        res.on('searchEntry', function(entry) {
+          userObj = _.extend({username: searchUsername.toLowerCase()},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
+          searchFuture.return(userObj); 
+        });
+        res.on('searchReference', function (referral) {
+          console.log('referral: ' + referral.uris.join());
+          searchFuture.return(false);
+        });
+        res.on('error', function(err) {
+          console.error('error: ' + err.message);
+          searchFuture.return(false);
+        });
+        res.on('end', function(result) {
+          if (_.isEmpty(userObj)) {
+            //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
+            console.log("No result found.");
+            searchFuture.return(false)
+          }
+          console.log('status: ' + result.status);
+        });
+      }
+    });
+    res = searchFuture.wait();
+    if (res) {
+      result = res;
+      break;
     }
   });
-  return searchFuture.wait();
+  return result;
 }
 
 Meteor.methods({
