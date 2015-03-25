@@ -11,27 +11,38 @@ LDAP.createClient = function(serverUrl) {
 }
 
 LDAP.bind = function (client, username, password) {
+  var success = null;
   //Bind our LDAP client.
-  var userDn = username+'@'+Meteor.settings.ldap.serverDn;
-  var bindFuture = new Future();
+  var ldap = Meteor.settings.ldap
+  var serverDCs = typeof(ldap.serverDc) == 'string'?[ldap.serverDc]:ldap.serverDc;
+  for (k in serverDCs) {
+    var serverDn = serverDCs[k].split(/,?DC=/).slice(1).join('.');
+    var userDn = username+'@'+serverDn;
 
-  client.bind(userDn, password, function (err) {
-    console.log ('Callback from binding LDAP:');
-    if (err) {
-    console.log(err);
-      console.log('LDAP bind failed with error');
-      console.log({dn: err.dn, code: err.code, name: err.name, message: err.message});
-      bindFuture.return(false);
-    } else {
-      bindFuture.return(true);
+    console.log ('Trying to bind ' + userDn + '...');
+
+    var bindFuture = new Future();
+    client.bind(userDn, password, function (err) {
+      console.log ('Callback from binding LDAP:');
+      if (err) {
+      console.log(err);
+        console.log('LDAP bind failed with error');
+        console.log({dn: err.dn, code: err.code, name: err.name, message: err.message});
+        bindFuture.return(false);
+      } else {
+        bindFuture.return(true);
+      }
+    });
+    success = bindFuture.wait();
+    if (success) {
+      break;
     }
-  });
+  }
 
-  var success = bindFuture.wait();
   if (!success || password === '') {
     throw new Meteor.Error(403, "Invalid credentials");
   }
-  return bindFuture.wait();
+  return ;
 }
 
 LDAP.search = function (client, searchUsername) {
@@ -43,12 +54,14 @@ LDAP.search = function (client, searchUsername) {
   };
   var serverDCs = typeof(Meteor.settings.ldap.serverDc) == 'string'?[Meteor.settings.ldap.serverDc]:Meteor.settings.ldap.serverDc;
   var result = false;
-  _.each(serverDCs, function(serverDc) {
+  for (k in serverDCs) {
     var searchFuture = new Future();
-    client.search(Meteor.settings.ldap.serverDc, opts, function(err, res) {
+    var serverDc = serverDCs[k];
+    console.log ('Searching '+serverDc);
+    client.search(serverDc, opts, function(err, res) {
       userObj = {};
       if(err) {
-        searchFuture.return(500)
+        searchFuture.return(500);
       }
       else {
         res.on('searchEntry', function(entry) {
@@ -73,13 +86,13 @@ LDAP.search = function (client, searchUsername) {
         });
       }
     });
-    res = searchFuture.wait();
-    if (res) {
-      result = res;
-      break;
+    result = searchFuture.wait();
+    if (result) {
+      return result;
     }
-  });
-  return result;
+  }
+  // User info not retrieved, just use username
+  return {username: searchUsername.toLowerCase()};
 }
 
 Meteor.methods({
@@ -87,11 +100,17 @@ Meteor.methods({
     if (!Meteor.settings.ldap) {
       throw new Error("LDAP settings missing.");
     }
-    console.log('LDAP authentication for ' + request.username);
-    var client = LDAP.createClient(Meteor.settings.ldap.serverUrl);
-    LDAP.bind(client, request.username, request.password);
-    userObj = LDAP.search(client, request.username);
-    client.unbind();
+
+    if (Meteor.settings.ldap.debugMode === true) {
+      userObj = {username: request.username.toLowerCase()};
+    } else {
+      console.log('LDAP authentication for ' + request.username);
+      var client = LDAP.createClient(Meteor.settings.ldap.serverUrl);
+      LDAP.bind(client, request.username, request.password);
+      userObj = LDAP.search(client, request.username);
+      client.unbind();
+    }
+
     var userId;
     var user = Meteor.users.findOne({username: request.username.toLowerCase()});
     if (user) {
