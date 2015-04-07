@@ -14,9 +14,9 @@ LDAP.bind = function (client, username, password) {
   var success = null;
   //Bind our LDAP client.
   var ldap = Meteor.settings.ldap
-  var serverDCs = typeof(ldap.serverDc) == 'string'?[ldap.serverDc]:ldap.serverDc;
-  for (k in serverDCs) {
-    var serverDn = serverDCs[k].split(/,?DC=/).slice(1).join('.');
+    var serverDNs = typeof(ldap.serverDn) == 'string'?[ldap.serverDn]:ldap.serverDn;
+  for (k in serverDNs) {
+    var serverDn = serverDNs[k].split(/,?DC=/).slice(1).join('.');
     var userDn = username+'@'+serverDn;
 
     console.log ('Trying to bind ' + userDn + '...');
@@ -25,7 +25,7 @@ LDAP.bind = function (client, username, password) {
     client.bind(userDn, password, function (err) {
       console.log ('Callback from binding LDAP:');
       if (err) {
-      console.log(err);
+        console.log(err);
         console.log('LDAP bind failed with error');
         console.log({dn: err.dn, code: err.code, name: err.name, message: err.message});
         bindFuture.return(false);
@@ -52,13 +52,13 @@ LDAP.search = function (client, searchUsername) {
     scope: 'sub',
     timeLimit: 2
   };
-  var serverDCs = typeof(Meteor.settings.ldap.serverDc) == 'string'?[Meteor.settings.ldap.serverDc]:Meteor.settings.ldap.serverDc;
+  var serverDNs = typeof(Meteor.settings.ldap.serverDn) == 'string'?[Meteor.settings.ldap.serverDn]:Meteor.settings.ldap.serverDn;
   var result = false;
-  for (k in serverDCs) {
+  for (k in serverDNs) {
     var searchFuture = new Future();
-    var serverDc = serverDCs[k];
-    console.log ('Searching '+serverDc);
-    client.search(serverDc, opts, function(err, res) {
+    var serverDn = serverDNs[k];
+    console.log ('Searching '+serverDn);
+    client.search(serverDn, opts, function(err, res) {
       userObj = {};
       if(err) {
         searchFuture.return(500);
@@ -95,48 +95,44 @@ LDAP.search = function (client, searchUsername) {
   return {username: searchUsername.toLowerCase()};
 }
 
-Meteor.methods({
-  loginWithLdap: function (request) {
-    if (!Meteor.settings.ldap) {
-      throw new Error("LDAP settings missing.");
-    }
-
-    if (Meteor.settings.ldap.debugMode === true) {
-      userObj = {username: request.username.toLowerCase()};
-    } else {
-      console.log('LDAP authentication for ' + request.username);
-      var client = LDAP.createClient(Meteor.settings.ldap.serverUrl);
-      LDAP.bind(client, request.username, request.password);
-      userObj = LDAP.search(client, request.username);
-      client.unbind();
-    }
-
-    var userId;
-    var user = Meteor.users.findOne({username: request.username.toLowerCase()});
-    if (user) {
-      userId = user._id;
-      Meteor.users.update(userId, {$set: userObj});
-    } else {
-      userId = Meteor.users.insert(userObj);
-    }
-    if(Meteor.settings.ldap.autopublishFields) {
-      Accounts.addAutopublishFields({
-        forLoggedInUser: Meteor.settings.ldap.autopublishFields,
-        forOtherUsers: Meteor.settings.ldap.autopublishFields
-      });
-    }
-    var stampedToken = Accounts._generateStampedLoginToken();
-    Meteor.users.update(userId,
-        {$push: {'services.resume.loginTokens': stampedToken}}
-        );
-
-    this.setUserId(userId);
-
-    return {
-      id: userId,
-      token: stampedToken.token,
-      tokenExpires: Accounts._tokenExpiration(stampedToken.when)
-    };
+Accounts.registerLoginHandler("ldap", function (request) {
+  if (!Meteor.settings.ldap) {
+    throw new Error("LDAP settings missing.");
   }
+
+  if (Meteor.settings.ldap.debugMode === true) {
+    userObj = {username: request.username.toLowerCase()};
+  } else {
+    console.log('LDAP authentication for ' + request.username);
+    var client = LDAP.createClient(Meteor.settings.ldap.serverUrl);
+    LDAP.bind(client, request.username, request.password);
+    userObj = LDAP.search(client, request.username);
+    client.unbind();
+  }
+
+  var userId;
+  var user = Meteor.users.findOne({username: request.username.toLowerCase()});
+  if (user) {
+    userId = user._id;
+    Meteor.users.update(userId, {$set: userObj});
+  } else {
+    userId = Meteor.users.insert(userObj);
+  }
+  if(Meteor.settings.ldap.autopublishFields) {
+    Accounts.addAutopublishFields({
+      forLoggedInUser: Meteor.settings.ldap.autopublishFields,
+      forOtherUsers: Meteor.settings.ldap.autopublishFields
+    });
+  }
+  var stampedToken = Accounts._generateStampedLoginToken();
+  var hashStampedToken = Accounts._hashStampedToken(stampedToken);
+  Meteor.users.update(userId,
+      {$push: {'services.resume.loginTokens': hashStampedToken}}
+      );
+  return {
+    userId: userId,
+      token: stampedToken.token,
+      tokenExpires: Accounts._tokenExpiration(hashStampedToken.when)
+  };
 });
 

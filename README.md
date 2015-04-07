@@ -13,7 +13,7 @@ To install the package, create a packages/ directory in your meteor app, and mov
 * meteor add hive:accounts-ldap
 
 ##Usage##
-Your server's DN, DC, and URL will need to be set in a settings.json file as `server_dn`, `server_dc`, and `server_url`, respectively. In addition, you can select an array of `whiteListedFields` from an LDAP search to add to the user object in Meteor.users. An example is in `examples/basic/config/settings.json.example`. 
+Your server's URL and a DN or DNs to search will need to be set in a settings.json file as `serverUrl` and `serverDn`, respectively. In addition, you can select an array of `whiteListedFields` from an LDAP search to add to the user object in Meteor.users. An example is in `examples/basic/config/settings.json.example`. 
 
 `{{> ldapLogin}}` renders a template with username and password inputs. If login is successful, the user will be added to Meteor.users(). It is up to the app to publish and subscribe fields. By default, only the username is published.
 
