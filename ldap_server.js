@@ -91,8 +91,12 @@ LDAP.search = function (client, searchUsername) {
       return result;
     }
   }
-  // User info not retrieved, just use username
-  return {username: searchUsername.toLowerCase()};
+  //If we're in debugMode, return an object with just the username. If not, return null to indicate no result was found.
+  if(Meteor.settings.ldap.debugMode === true) {
+    return {username: searchUsername.toLowerCase()};
+  } else {
+    return null;
+  }
 }
 
 Accounts.registerLoginHandler("ldap", function (request) {
