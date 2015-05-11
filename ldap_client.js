@@ -40,7 +40,7 @@ initLogin = function(e, tpl) {
         return true;
       else {
         firstAttempt = false;
-        return false
+        return false;
       }
     });
     return result;
