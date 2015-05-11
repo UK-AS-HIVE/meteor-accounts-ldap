@@ -1,11 +1,3 @@
-
-/*UI.registerHelper(
-  "ldapLogin",
-  function (option) {
-    return new Spacebars.SafeString(Template.ldapLogin());
-  }
-);*/
-
 var firstAttempt = true;
 
 Template.ldapLogin.events({
@@ -14,7 +6,7 @@ Template.ldapLogin.events({
   },
   'keyup input' : function (e, tpl){
     if (e.keyCode == 13){ //If Enter Key Pressed
-        initLogin(e,tpl)
+        initLogin(e,tpl);
       }
   },
   'click button[name="logout"]': function(e) {
@@ -36,21 +28,20 @@ Template.ldapLogin.helpers({
   failedLogin : function(){
     return !firstAttempt; //return true if more than one attempt has been made. Show Error Message
   }
-})
+});
 
 
 // Initiate Login Process:
-initLogin = function(e, tpl)
-{
-  firstAttempt = false;
+initLogin = function(e, tpl) {
     var username = $(tpl.find('input[name="ldap"]')).val();
     var password = $(tpl.find('input[name="password"]')).val();
     var result = Meteor.loginWithLdap(username, password, function() {
       if (Meteor.userId())
         return true;
-      else 
+      else {
+        firstAttempt = false;
         return false
+      }
     });
     return result;
-}
-
+};

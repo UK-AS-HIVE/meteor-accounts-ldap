@@ -8,14 +8,14 @@ LDAP.createClient = function(serverUrl) {
     url: serverUrl
   });
   return client;
-}
+};
 
 LDAP.bind = function (client, username, password) {
   var success = null;
   //Bind our LDAP client.
-  var ldap = Meteor.settings.ldap
+  var ldap = Meteor.settings.ldap;
     var serverDNs = typeof(ldap.serverDn) == 'string'?[ldap.serverDn]:ldap.serverDn;
-  for (k in serverDNs) {
+  for (var k in serverDNs) {
     var serverDn = serverDNs[k].split(/,?DC=/).slice(1).join('.');
     var userDn = username+'@'+serverDn;
 
@@ -43,7 +43,7 @@ LDAP.bind = function (client, username, password) {
     throw new Meteor.Error(403, "Invalid credentials");
   }
   return ;
-}
+};
 
 LDAP.search = function (client, searchUsername) {
   //Search our previously bound connection. If the LDAP client isn't bound, this should throw an error.
@@ -54,7 +54,7 @@ LDAP.search = function (client, searchUsername) {
   };
   var serverDNs = typeof(Meteor.settings.ldap.serverDn) == 'string'?[Meteor.settings.ldap.serverDn]:Meteor.settings.ldap.serverDn;
   var result = false;
-  for (k in serverDNs) {
+  for (var k in serverDNs) {
     var searchFuture = new Future();
     var serverDn = serverDNs[k];
     console.log ('Searching '+serverDn);
@@ -80,7 +80,7 @@ LDAP.search = function (client, searchUsername) {
           if (_.isEmpty(userObj)) {
             //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
             console.log("No result found.");
-            searchFuture.return(false)
+            searchFuture.return(false);
           }
           console.log('status: ' + result.status);
         });
@@ -97,7 +97,7 @@ LDAP.search = function (client, searchUsername) {
   } else {
     return null;
   }
-}
+};
 
 Accounts.registerLoginHandler("ldap", function (request) {
   if (!Meteor.settings.ldap) {
