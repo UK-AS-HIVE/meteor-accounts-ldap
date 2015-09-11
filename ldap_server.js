@@ -66,6 +66,9 @@ LDAP.search = function (client, searchUsername) {
       else {
         res.on('searchEntry', function(entry) {
           userObj = _.extend({username: searchUsername.toLowerCase()},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
+          if(userObj.memberOf) {
+            userObj.memberOf = [].concat(userObj.memberOf) // Be sure memberOf is an array
+          }
           searchFuture.return(userObj); 
         });
         res.on('searchReference', function (referral) {
