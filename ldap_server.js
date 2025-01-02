@@ -48,7 +48,7 @@ LDAP.bind = function (client, username, password) {
 LDAP.search = function (client, searchUsername) {
   //Search our previously bound connection. If the LDAP client isn't bound, this should throw an error.
   var opts = {
-    filter: '(&(cn='+searchUsername+')(objectClass=user))',
+    filter: '(&(cn='+searchUsername+')(sAMAccountName='+searchUsername+')(objectClass=user))',
     scope: 'sub',
     timeLimit: 2
   };
@@ -61,31 +61,42 @@ LDAP.search = function (client, searchUsername) {
     client.search(serverDn, opts, function(err, res) {
       userObj = {};
       if(err) {
+        console.log("  -> err!", err);
         searchFuture.return(500);
       }
       else {
         res.on('searchEntry', function(entry) {
+          console.log('  -> searchEntry', entry.object.dn);
           userObj = _.extend({username: searchUsername.toLowerCase()},_.pick(entry.object, Meteor.settings.ldap.whiteListedFields));
           if(userObj.memberOf) {
             userObj.memberOf = [].concat(userObj.memberOf) // Be sure memberOf is an array
           }
-          searchFuture.return(userObj); 
+          if (!result) {
+            searchFuture.return(userObj);
+          }
         });
         res.on('searchReference', function (referral) {
-          console.log('referral: ' + referral.uris.join());
-          searchFuture.return(false);
+          console.log('  -> referral: ' + referral.uris.join());
+          if (!result) {
+            searchFuture.return(false);
+          }
         });
         res.on('error', function(err) {
-          console.error('error: ' + err.message);
-          searchFuture.return(false);
+          console.error('  -> error: ', err.message);
+          if (!result) {
+            searchFuture.return(false);
+          }
         });
-        res.on('end', function(result) {
+        res.on('end', function(endResult) {
+          console.log('  -> end');
           if (_.isEmpty(userObj)) {
             //Our LDAP server gives no indication that we found no entries for our search, so we have to make sure our object isn't empty.
             console.log("No result found.");
-            searchFuture.return(false);
+            if (!result) {
+              searchFuture.return(false);
+            }
           }
-          console.log('status: ' + result.status);
+          console.log('status: ' + endResult.status);
         });
       }
     });
